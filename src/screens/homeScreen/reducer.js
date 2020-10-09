@@ -1,18 +1,36 @@
-import {GET, HOME, HOMEWITHOUT, SUCCESS} from "../../utils/constant";
+import { FAIL, GET, HOME, PENDING, SUCCESS } from '../../utils/constant';
 
-const home = (state = [], action) => {
-    switch(action.type) {
-        case HOME + GET + SUCCESS: {
-            return [...state, 'test1', 'test2']
-        }
-        case HOMEWITHOUT + GET: {
-            const i = state.length + 1;
-            return [...state, 'test'+i]
-        }
-        default: {
-            return state;
-        }
+const home = (
+  state = { ids: [], nextId: [], nextNumber: [], stories: [], loading: false, error: false },
+  action,
+) => {
+  switch (action.type) {
+    case HOME + GET + SUCCESS: {
+      const { ids, stories } = action.data;
+      return {
+        ...state,
+        ids,
+        stories,
+        loading: false,
+      };
     }
+    case HOME + GET + PENDING: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+    case HOME + GET + FAIL: {
+      return {
+        ...state,
+        loading: false,
+        error: true,
+      };
+    }
+    default: {
+      return state;
+    }
+  }
 };
 
 export default home;

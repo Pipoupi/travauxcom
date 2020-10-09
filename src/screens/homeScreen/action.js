@@ -1,13 +1,8 @@
-import {GET, HOME, HOMEWITHOUT} from "../../utils/constant";
+import { GET, HOME } from '../../utils/constant';
 
-export const getHome = () => {
-    return {
-        type: HOME + GET
-    }
+export const getHome = (url) => {
+  return {
+    type: HOME + GET,
+    url,
+  };
 };
-
-export const getHomeWithoutSaga = () => {
-    return {
-        type: HOMEWITHOUT + GET
-    }
-}

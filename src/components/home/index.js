@@ -1,45 +1,75 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Button from '@material-ui/core/Button';
+import { Link, useLocation } from 'react-router-dom';
+import { GreySpan, NormalSpan, SmallSpan, StoryDiv, SmallSpanLink } from './style';
+import { go2url } from '../../utils/goUrl';
+import { getTimeFromX } from '../../utils/getTimeFromX';
 
-import { ButtonStyled } from './style';
+const Home = ({ stories, getHome, loading, error }) => {
+  const location = useLocation();
+  const { pathname } = location;
 
-const Home = ({ home, getHome, getHomeWithoutSaga }) => {
+  // const { id } = useParams();
+
   React.useEffect(() => {
-    getHome();
-  }, [getHome]);
+    if (pathname === '/front') {
+      getHome();
+    } else if (pathname === '/newest') {
+      getHome('newest');
+    } else if (pathname === '/ask') {
+      getHome('ask');
+    } else if (pathname === '/show') {
+      getHome('show');
+    }
+  }, [getHome, pathname]);
 
-  const [checked, setChecked] = React.useState(false);
+  if (error) {
+    return <div>Something went wrong</div>;
+  }
 
   return (
     <>
-      <div>
-        {home.map((el) => (
-          <FormControlLabel
-            key={`check${el}`}
-            control={<Checkbox checked={checked} />}
-            label={el}
-          />
-        ))}
-      </div>
-      <Button variant="contained" onClick={() => setChecked(!checked)}>
-        {checked ? 'Uncheck it !' : 'Check it !'}
-      </Button>
-      <ButtonStyled onClick={() => getHomeWithoutSaga()}> Add a checkbox </ButtonStyled>
+      {error}
+      {loading ? (
+        'loading....'
+      ) : (
+        <>
+          {stories.map((el, i) => {
+            return (
+              <StoryDiv>
+                <div onClick={() => go2url(el.url)}>
+                  <GreySpan>{i}. </GreySpan>
+                  <NormalSpan>{el.title}</NormalSpan>
+                </div>
+                <div>
+                  <SmallSpan>
+                    {el.score} points by <Link to={`/user?id=${el.by}`}>{el.by}</Link>{' '}
+                    <SmallSpanLink>{getTimeFromX(el.time)}</SmallSpanLink> |{' '}
+                    <Link
+                      to={{ pathname: '/item', search: `?id=${el.id}`, state: { content: el } }}
+                    >
+                      {el.descendants} {el.descendants === 0 ? 'comment' : 'comments'}
+                    </Link>
+                  </SmallSpan>
+                </div>
+              </StoryDiv>
+            );
+          })}
+        </>
+      )}
     </>
   );
 };
 
 Home.defaultProps = {
-  home: [],
+  stories: [],
 };
 
 Home.propTypes = {
   getHome: PropTypes.func.isRequired,
-  getHomeWithoutSaga: PropTypes.func.isRequired,
-  home: PropTypes.arrayOf(PropTypes.shape),
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.bool.isRequired,
+  stories: PropTypes.arrayOf(PropTypes.shape),
 };
 
 export default Home;
